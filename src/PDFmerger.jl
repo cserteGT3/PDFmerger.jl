@@ -1,9 +1,9 @@
 module PDFmerger
 
 import Base.Filesystem
-using Poppler_jll: pdfunite, pdfinfo
+using Poppler_jll: pdfunite, pdfinfo, pdfseparate
 
-export merge_pdfs, append_pdf!
+export merge_pdfs, append_pdf!, split_pdf
 
 """
 ```
@@ -120,6 +120,17 @@ function n_pages(file)
     m = match(r"Pages:\s+(?<npages>\d+)", str)
     isnothing(m) && error("Could not extract number of pages from:\n\n $str")
     parse(Int, m[:npages])
+end
+
+"""
+    split_pdf(file, destination="split_%d.pdf")
+
+Split pdf.
+"""
+function split_pdf(file, destination="split_%d.pdf")
+	pdfseparate() do separate
+		run(`$separate $file $destination`)
+	end
 end
 
 end
